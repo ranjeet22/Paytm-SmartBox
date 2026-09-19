@@ -1,11 +1,25 @@
 <div align="center">
 
-# SmartBox
+# 🔊 SmartBox
 
 ### Your Paytm Soundbox, now with an AI teammate.
 
 **A voice-first AI teammate for Paytm merchants that understands requests, remembers business context, automates repetitive work, and executes approved actions.**
 
+<br/>
+
+![Paytm AI Hackathon](https://img.shields.io/badge/Paytm-AI%20Hackathon-00BAF2?style=for-the-badge&logo=paytm&logoColor=white)
+![Voice First](https://img.shields.io/badge/Voice-First-002970?style=for-the-badge)
+![Hindi](https://img.shields.io/badge/Language-Hindi%20%2B%20Indic-FF9933?style=for-the-badge)
+
+![n8n](https://img.shields.io/badge/Orchestration-n8n-EA4B71?style=flat-square&logo=n8n&logoColor=white)
+![Gemini](https://img.shields.io/badge/LLM-Google%20Gemini-4285F4?style=flat-square&logo=googlegemini&logoColor=white)
+![Sarvam](https://img.shields.io/badge/Voice-Sarvam%20AI-FF6B00?style=flat-square)
+![Cognee](https://img.shields.io/badge/Memory-Cognee-6C47FF?style=flat-square)
+![HTML](https://img.shields.io/badge/Frontend-HTML%20%7C%20CSS%20%7C%20JS-E34F26?style=flat-square&logo=html5&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Working%20MVP-success?style=flat-square)
+
+<br/>
 <!--  [Demo Video](ADD_LINK) · [Live Prototype](ADD_LINK) · [Presentation](ADD_LINK) -->
 
 </div>
@@ -17,6 +31,18 @@
 SmartBox is built for the **Paytm AI Hackathon - Delhi**, focused on building practical AI solutions with real-world impact.
 
 The project combines **Google Gemini, n8n, Cognee, and a lightweight web interface** to create a conversational AI workflow for merchants.
+
+---
+
+## 60-Second Summary
+| | |
+|---|---|
+| **The problem** | Merchants generate valuable data every day (sales, repeat customers, popular products) but it stays locked inside dashboards, spreadsheets and apps they don't have time to learn. |
+| **Our solution** | SmartBox turns the Soundbox from a device that only *announces payments* into an AI teammate that *understands, remembers and acts*. |
+| **How the merchant uses it** | Press, hold, speak in Hindi, release. SmartBox answers **in voice**. |
+| **What it can do** | **ASK** questions about the business · **AUTOMATE** recurring tasks · **ACT** on approved business actions (e.g. customer promotions). |
+| **What makes it different** | Voice-first · Indian-language · long-term memory · real executable workflows · human approval before any consequential action. |
+| **Stack** | `Sarvam AI` (hear + speak) → `Gemini` (understand + decide) → `n8n` (execute) ↔ `Cognee` (remember) |
 
 ---
 
@@ -51,30 +77,67 @@ SmartBox understands the request and routes it to the right workflow.
 ## Architecture
 
 ```mermaid
-flowchart LR
-    M["Merchant"] --> UI["SmartBox UI"]
-    UI --> N["n8n Webhook"]
-    N --> G["Gemini<br/>Intent Classification"]
-    G --> R{"Router"}
+flowchart TD
+    M(["🧑‍🍳 MERCHANT<br/>Voice / Text"]) --> UI["🖥️ SmartBox UI<br/>HTML + CSS + JavaScript"]
+    UI -->|HTTP POST| WH["⚙️ n8n Webhook<br/>Normalize Request"]
 
-    R -->|ASK| A["Sales Agent"]
-    R -->|AUTOMATE| B["Automation"]
-    R -->|ACT| C["Promotion Agent"]
+    WH --> G["🤖 Gemini LLM<br/>Intent Classification"]
+    G --> SW{"🔀 Intent Router<br/>Switch"}
 
-    A <--> MEM["Cognee<br/>Memory"]
-    B <--> MEM
-    C <--> MEM
+    SW -->|ASK| ASK["🟦 Sales Agent"]
+    SW -->|AUTOMATE| AUTO["🟨 Schedule Workflow"]
+    SW -->|ACT| ACT["🟥 Promotion Agent"]
 
-    A --> OUT["Final Response<br/>n8n Respond to Webhook"]
-    B --> OUT
-    C --> OUT
+    ASK --> DATA[("📊 Business /<br/>Customer Data")]
+    ACT --> DATA
+    AUTO --> DATA
 
-    OUT --> UI
+    ASK <--> MEM[("🧠 Cognee<br/>Memory")]
+    AUTO <--> MEM
+    ACT <--> MEM
+
+    ASK --> R(["🔊 Final Response<br/>to Merchant"])
+    AUTO --> R
+    ACT -->|after approval| WA["💬 WhatsApp Adapter"]
+    ACT --> R
+
+    classDef ask fill:#dbeafe,stroke:#2563eb,color:#111;
+    classDef auto fill:#fef3c7,stroke:#d97706,color:#111;
+    classDef act fill:#fee2e2,stroke:#dc2626,color:#111;
+    class ASK ask;
+    class AUTO auto;
+    class ACT act;
 ```
+
+### Separation of responsibilities
+
+The LLM is **not** responsible for everything. Each component has one job:
+
+```mermaid
+flowchart LR
+    G["🤖 Gemini<br/><b>Understand + Decide</b>"] --- N["⚙️ n8n<br/><b>Execute + Connect + Schedule</b>"]
+    N --- C["🧠 Cognee<br/><b>Remember</b>"]
+    N --- D["📊 Business Data<br/><b>Provide Facts</b>"]
+```
+
+### How the stack works
+
+```text
+Gemini       → Understand and classify
+Cognee       → Remember
+n8n          → Execute and automate
+SmartBox UI  → Interact with merchant
+Render       → Deploy and host
+```
+
+
+> This separation makes the system **easier to control, debug and expand**. The LLM decides; n8n executes; memory persists; data supplies the facts.
+
+---
 
 ### n8n Workflow
 
-![n8n Workflow](assets/n8n-workflow.png)
+<img width="1106" height="464" alt="Image" src="https://github.com/user-attachments/assets/e23fbd0a-20f9-4d26-9a31-1cfe687100fa" /> 
 
 ---
 
@@ -89,16 +152,6 @@ flowchart LR
 | **Render** | Deployment and hosting |
 | **WhatsApp / API Adapter** | Customer communication |
 | **Business Data Adapter** | Transaction and merchant data |
-
-### How the stack works
-
-```text
-Gemini       → Understand and classify
-Cognee       → Remember
-n8n          → Execute and automate
-SmartBox UI  → Interact with merchant
-Render       → Deploy and host
-```
 
 ---
 
@@ -196,25 +249,15 @@ ACT
 
 ---
 
-## Demo
+## Demo:
 
-### ASK
-
-**"Aaj ki sale kitni hui?"**
-
-SmartBox retrieves sales information and returns the result through the final n8n response.
-
-### AUTOMATE
-
-**"Roz raat 9 baje mujhe sales report bhejna."**
-
-SmartBox converts the request into a scheduled n8n workflow.
-
-### ACT
-
-**"Mere regular customers ko monthly offer bhejo."**
-
-SmartBox uses memory and customer context to prepare the action and requests merchant approval before execution.
+| The merchant says | Intent | What SmartBox does |
+|---|---|---|
+| *"Aaj ki sale kitni hui?"* | 🟦 `ASK` | Reads today's sales and replies in voice: *"Aaj ki total sale ₹23,450 hai aur 126 transactions hue hain."* |
+| *"Roz raat 9 baje mujhe sales report bhejna."* | 🟨 `AUTOMATE` | Extracts task + frequency + time and turns it into a scheduled n8n workflow. |
+| *"Mere regular customers ko monthly ration ka offer bhejo."* | 🟥 `ACT` | Finds regular customers, applies remembered preferences, drafts a message, asks for approval, sends, verifies, remembers. |
+| *"Mere customers ko Hindi mein message karna."* | 🧠 Memory | Stores *language = Hindi* as a permanent merchant preference. |
+| *"10% se zyada discount mat dena."* | 🧠 Memory | Stores *max discount = 10%* as a business rule. Later offers respect it automatically. |
 
 ---
 
@@ -239,24 +282,6 @@ http://localhost:8000
 3. Configure the Cognee datasets.
 4. Activate the n8n webhook.
 5. Update the webhook URL in `app.js`.
-
----
-
-## Deployment
-
-The application can be deployed using **Render**.
-
-```text
-GitHub Repository
-      ↓
-Render
-      ↓
-SmartBox Web Interface
-      ↓
-n8n Webhook
-      ↓
-Gemini / Cognee / Business Workflows
-```
 
 ---
 
